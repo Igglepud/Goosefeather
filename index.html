@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Goose Feather Crafts — Custom Return Address Labels</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            teal: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              200: '#99f6e4',
+              300: '#5eead4',
+              400: '#2dd4bf',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            }
+          },
+          fontFamily: {
+            display: ['Playfair Display', 'Georgia', 'serif'],
+            body: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .font-display { font-family: 'Playfair Display', Georgia, serif; }
+
+    /* Smooth modal transitions */
+    .modal-overlay { transition: opacity 0.3s ease; }
+    .modal-content { transition: transform 0.3s ease, opacity 0.3s ease; }
+    .modal-hidden .modal-overlay { opacity: 0; pointer-events: none; }
+    .modal-hidden .modal-content { transform: scale(0.95) translateY(10px); opacity: 0; pointer-events: none; }
+
+    /* Hover effects */
+    .product-card:hover { transform: translateY(-4px); }
+    .product-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .product-card:hover { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15); }
+
+    /* Quantity button */
+    .qty-btn { transition: all 0.15s ease; }
+    .qty-btn:hover { transform: scale(1.1); }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f0fdfa; }
+    ::-webkit-scrollbar-thumb { background: #0d9488; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #115e59; }
+
+    /* Fade-in animation */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    /* Stagger children */
+    .stagger-children > * {
+      opacity: 0;
+      animation: fadeInUp 0.5s ease-out forwards;
+    }
+    .stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+    .stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+    .stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+    .stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+    .stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+
+    /* Price highlight */
+    .price-row { transition: background-color 0.15s ease; cursor: pointer; }
+    .price-row:hover, .price-row.selected { background-color: #ccfbf1; border-left-color: #0d9488; }
+
+    /* Image zoom on hover */
+    .img-zoom { transition: transform 0.4s ease; }
+    .product-card:hover .img-zoom { transform: scale(1.05); }
+
+    /* Payment button shimmer placeholder */
+    .payment-placeholder::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; 
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      animation: shimmer 2s infinite;
+    }
+    @keyframes shimmer {
+      100% { left: 100%; }
+    }
+
+    /* Toast notification */
+    .toast { transition: transform 0.3s ease, opacity 0.3s ease; }
+    .toast-hide { transform: translateX(120%); opacity: 0; pointer-events: none; }
+    .toast-show { transform: translateX(0); opacity: 1; }
+
+    /* Quantity option card */
+    .qty-option-wrapper input[type="radio"] { display: none; }
+    .qty-option-wrapper label { cursor: pointer; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- ===================== HEADER / NAVIGATION ===================== -->
+  <header class="bg-white shadow-sm sticky top-0 z-40 border-b border-teal-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="closeModal()">
+          <svg class="w-8 h-8 text-teal-700" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          <div>
+            <h1 class="font-display text-xl font-bold text-teal-800 leading-tight">Goose Feather Crafts</h1>
+            <p class="text-[0.65rem] text-gray-400 tracking-widest uppercase -mt-0.5">Custom Return Address Labels</p>
+          </div>
+        </div>
+
+        <!-- Nav links -->
+        <nav class="hidden sm:flex items-center gap-8 text-sm font-medium">
+          <a href="#products" class="text-gray-600 hover:text-teal-700 transition">Shop</a>
+          <a href="#about" class="text-gray-600 hover:text-teal-700 transition">About</a>
+          <span class="text-teal-700 bg-teal-50 px-3 py-1 rounded-full border border-teal-200 font-semibold">$6 flat rate — Labels only</span>
+        </nav>
+
+        <!-- Cart icon -->
+        <div class="relative" id="cart-icon">
+          <button onclick="toggleCartSummary()" class="relative p-2 text-gray-700 hover:text-teal-700 transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15a3 3 0 00-3-3m-7.25 0a3 3 0 013-3h2.5a3 3 0 013 3m-9.8 0H2.25"/>
+              <path d="M2.25 3v6.25l3.75 11.25a1.125 1.125 0 01-1.1 1.5H1.1a1.125 1.125 0 01-1.1-1.5L4.875 9.25V3h15v6" fill="none"/>
+            </svg>
+            <span id="cart-count" class="absolute -top-1 -right-1 bg-teal-600 text-white text-[0.6rem] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== HERO SECTION ===================== -->
+  <section class="relative bg-gradient-to-br from-teal-800 via-teal-700 to-teal-900 overflow-hidden">
+    <!-- Decorative pattern -->
+    <div class="absolute inset-0 opacity-10">
+      <svg width="100%" height="100%">
+        <defs>
+          <pattern id="feather" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+            <path d="M30 5 Q40 20 35 35 Q30 45 25 35 Q20 20 30 5Z" fill="none" stroke="white" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#feather)"/>
+      </svg>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center">
+      <h2 class="font-display text-3xl sm:text-5xl font-bold text-white mb-4 leading-tight animate-fade-in-up">
+        Add Some Whimsical Fun<br>to Your Mailings
+      </h2>
+      <p class="text-teal-100 text-base sm:text-lg max-w-2xl mx-auto mb-8 animate-fade-in-up" style="animation-delay: 0.15s">
+        Personalized return address labels with unique, whimsical designs — shipped right to your door!
+      </p>
+      <a href="#products" class="inline-flex items-center gap-2 bg-white text-teal-800 font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all animate-fade-in-up hover:bg-teal-50" style="animation-delay: 0.3s">
+        Shop Designs
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+      </a>
+
+      <!-- Quick features row -->
+      <div class="flex flex-wrap justify-center gap-6 sm:gap-10 mt-12 text-teal-200 text-sm animate-fade-in-up" style="animation-delay: 0.45s">
+        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Personalized Labels</span>
+        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Matte Finish</span>
+        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Unique Designs</span>
+        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> US Shipping $6</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PRODUCTS GRID ===================== -->
+  <section id="products" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+    <div class="text-center mb-12">
+      <h3 class="font-display text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Choose Your Design</h3>
+      <p class="text-gray-500 max-w-lg mx-auto">Each design is printed on high-quality matte sticker paper — 1" x 2.625" labels with vibrant colors and smooth texture.</p>
+    </div>
+
+    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 stagger-children">
+      <!-- Products injected by JS -->
+    </div>
+  </section>
+
+  <!-- ===================== ABOUT SECTION ===================== -->
+  <section id="about" class="bg-white border-t border-gray-100">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+      <div class="text-center mb-10">
+        <h3 class="font-display text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Designed Just for You!</h3>
+        <p class="text-teal-600 font-medium">✨ Each label is 1" x 2.625" with a smooth matte finish</p>
+      </div>
+      <div class="prose prose-gray mx-auto text-gray-600 leading-relaxed space-y-4">
+        <p>These labels are printed on high-quality matte sticker paper and feature one-of-a-kind illustrations and themed clipart. Whether you're sending birthday invites or just want to add a little personality to your mail, these labels bring a fun and whimsical touch to every envelope!</p>
+        <p>Have a special request? Reach out — I'd love to create something just for you! Custom orders are welcome.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-12">
+        <div class="bg-teal-50 rounded-xl p-6 border border-teal-100">
+          <h4 class="font-semibold text-teal-800 mb-2">✔ Proof Available Upon Request</h4>
+          <p class="text-sm text-gray-600">Want to see your design before printing? Just ask!</p>
+        </div>
+        <div class="bg-teal-50 rounded-xl p-6 border border-teal-100">
+          <h4 class="font-semibold text-teal-800 mb-2">✔ Matching Envelope Seals</h4>
+          <p class="text-sm text-gray-600">Complete the look with coordinating 1" round envelope seals (optional).</p>
+        </div>
+        <div class="bg-teal-50 rounded-xl p-6 border border-teal-100">
+          <h4 class="font-semibold text-teal-800 mb-2">✔ Custom Orders Welcome</h4>
+          <p class="text-sm text-gray-600">Have a fun idea or favorite theme? Message me with requests!</p>
+        </div>
+        <div class="bg-teal-50 rounded-xl p-6 border border-teal-100">
+          <h4 class="font-semibold text-teal-800 mb-2">✔ Perfect for Any Occasion</h4>
+          <p class="text-sm text-gray-600">Birthday invitations, party favors, holiday cards, and pen pal letters!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="bg-gray-900 text-gray-400 py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <p class="font-display text-lg text-white mb-2">Goose Feather Crafts</p>
+      <p class="text-sm">&#169; 2026 Goose Feather Crafts. All rights reserved.</p>
+      <p class="text-xs mt-4 text-gray-500">Handcrafted with care &#10084;</p>
+    </div>
+  </footer>
+
+  <!-- ===================== MODAL: PRODUCT DETAIL & ORDER ===================== -->
+  <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-hidden">
+    <div class="modal-overlay absolute inset-0 bg-black/50" onclick="closeModal()"></div>
+    <div class="modal-content relative w-full max-w-3xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+      <!-- Close button -->
+      <button onclick="closeModal()" class="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-white hover:bg-black/40 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="overflow-y-auto flex-1" id="modal-body">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TOAST NOTIFICATION ===================== -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 toast toast-hide bg-gray-900 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3">
+    <svg class="w-5 h-5 text-teal-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+    <span id="toast-msg" class="text-sm font-medium"></span>
+  </div>
+
+  <!-- ===================== JAVASCRIPT ===================== -->
+  <script>
+    // ===== Product data =====
+    const products = [
+      {
+        id: 'axolotl',
+        title: 'Axolotl Address Labels',
+        image: 'images/axolotlad.jpg',
+      },
+      {
+        id: 'construction',
+        title: 'Construction Truck Address Labels',
+        image: 'images/constructiontruckad.jpg',
+      },
+      {
+        id: 'cow',
+        title: 'Cow Address Labels',
+        image: 'images/dairycowad.jpg',
+      },
+      {
+        id: 'dragonfly',
+        title: 'Dragonfly Address Labels',
+        image: 'images/dragonflyad.jpg',
+      },
+      {
+        id: 'flowers',
+        title: 'Floral Address Labels',
+        image: 'images/FlowersAd.jpg',
+      },
+    ];
+
+    // Pricing tiers — 6 options per product from the two columns (labels only / w/ seals)
+    const qtyOptions = [
+      { label: '30',       price: 6,  withSeals: 8  },
+      { label: '60',       price: 8,  withSeals: 12 },
+      { label: '90',       price: 11, withSeals: 17 },
+      { label: '120',      price: 13, withSeals: 21 },
+      { label: '150',      price: 16, withSeals: 26 },
+      { label: '180',      price: 19, withSeals: 29 },
+    ];
+
+    const shippingCost = 6;
+
+    // ===== Render product grid =====
+    function renderProducts() {
+      const grid = document.getElementById('product-grid');
+      grid.innerHTML = products.map(p => `
+        <div class="product-card bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 cursor-pointer" onclick="openProduct('${p.id}')">
+          <div class="aspect-[4/3] overflow-hidden bg-gray-100">
+            <img src="${p.image}" alt="${p.title}" loading="lazy" class="w-full h-full object-cover img-zoom" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-full text-gray-400\\'><svg class=\\'w-12 h-12\\' fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'1.5\\' d=\\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z\\'/></svg><p class=\\'text-xs mt-2\\'>Image unavailable</p></div>'">
+          </div>
+          <div class="p-5">
+            <h4 class="font-display font-semibold text-gray-900 text-lg mb-1">${p.title}</h4>
+            <p class="text-gray-500 text-sm leading-relaxed line-clamp-2">Add some whimsical fun to your mailings with these personalized return address labels shipped right to your door!</p>
+            <div class="flex items-center justify-between mt-3">
+              <span class="text-teal-700 font-bold text-lg">$${qtyOptions[0].price}</span>
+              <span class="text-xs bg-teal-50 text-teal-700 px-2 py-1 rounded-full border border-teal-200 font-medium">From</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ===== Open product modal =====
+    function openProduct(id) {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+
+      const body = document.getElementById('modal-body');
+      body.innerHTML = `
+        <!-- Product image -->
+        <div class="relative bg-teal-50" style="height:280px">
+          <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-full text-gray-400 text-sm\\'><p>Preview unavailable</p></div>'">
+          <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/30 to-transparent h-16"></div>
+        </div>
+
+        <!-- Details -->
+        <div class="p-6 sm:p-8">
+          <h2 class="font-display text-2xl font-bold text-gray-900 mb-2">${p.title}</h2>
+          <p class="text-gray-500 leading-relaxed mb-6">${productFullDescription(p)}</p>
+
+          <!-- Divider -->
+          <hr class="border-gray-100 mb-6">
+
+          <!-- Quantity selection -->
+          <div class="mb-8">
+            <h4 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <svg class="w-4 h-4 text-teal-600" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V12.732a2 2 0 000-3.464V4zM17 4a1 1 0 10-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4z"/></svg>
+              Select Quantity &amp; Option
+            </h4>
+            <div class="space-y-2">
+              ${qtyOptions.map((q, i) => `
+                <div class="flex gap-2 sm:gap-3">
+                  <label class="qty-option-wrapper price-row flex items-center justify-between flex-1 border-l-4 border-gray-300 rounded-lg px-4 py-3 bg-gray-50">
+                    <span class="font-medium text-gray-800">${q.label} Labels Only</span>
+                    <input type="radio" name="price-opt-${p.id}-${q.label}" value="${q.price}" checked="${i===0?'checked':''}" onchange="updatePrice('${p.id}', ${q.label}, ${q.price}, '${p.id}')">
+                    <span class="font-bold text-teal-700">$${q.price}</span>
+                  </label>
+                  <label class="qty-option-wrapper price-row flex items-center justify-between flex-1 border-l-4 border-gray-300 rounded-lg px-4 py-3 bg-gray-50">
+                    <span class="font-medium text-gray-800">${q.label} w/ Env Seals</span>
+                    <input type="radio" name="price-opt-${p.id}-${q.label}" value="${q.withSeals}" onchange="updatePrice('${p.id}', ${q.label}, ${q.withSeals}, '${p.id}')">
+                    <span class="font-bold text-teal-700">$${q.withSeals}</span>
+                  </label>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Personalization -->
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+              <svg class="w-4 h-4 text-teal-600" fill="currentColor" viewBox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
+              Personalization: &nbsp;<span class="text-sm font-normal text-gray-500">Please enter the name/address or custom text (up to four lines)</span>
+            </h4>
+            <textarea id="personalize-${p.id}" rows="3" maxlength="200" placeholder="Line 1: Your Name&#10;Line 2: Street Address&#10;Line 3: City, ST ZIP&#10;Line 4: (optional)" class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none resize-none"></textarea>
+          </div>
+
+          <!-- Email for proof -->
+          <div class="mb-8">
+            <h4 class="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+              <svg class="w-4 h-4 text-teal-600" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+              Proof &amp; Contact: &nbsp;<span class="text-sm font-normal text-gray-500">Enter an email address for proof / questions</span>
+            </h4>
+            <input id="email-${p.id}" type="email" placeholder="your@email.com" class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none">
+          </div>
+
+          <!-- Order summary bar -->
+          <div class="bg-teal-50 rounded-xl p-5 mb-6 border border-teal-100">
+            <div class="flex justify-between text-sm text-gray-600 mb-2"><span>Labels subtotal</span><span id="subtotal-${p.id}">$${qtyOptions[0].price}</span></div>
+            <div class="flex justify-between text-sm text-gray-600 mb-3"><span>Shipping (US)</span><span>$${shippingCost.toFixed(2)}</span></div>
+            <hr class="border-teal-200 mb-3">
+            <div class="flex justify-between font-bold text-lg text-gray-900"><span>Total</span><span id="total-${p.id}">$${qtyOptions[0].price + shippingCost}</span></div>
+          </div>
+
+          <!-- Checkout buttons (non-functional — placeholder) -->
+          <h4 class="font-semibold text-gray-900 mb-3">Send Payment</h4>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 relative overflow-hidden">
+            ${['PayPal','Venmo','Cash App','Contact Me'].map(name => `
+              <button type="button" onclick="checkout('${p.id}', '${name}')" 
+                class="relative group py-3 px-2 rounded-xl font-semibold text-sm border-2 border-gray-200 hover:border-teal-500 transition-colors ${name==='PayPal'?'text-blue-600':name==='Venmo'?'text-violet-600':name==='Cash App'?'text-green-600':'text-gray-700'} bg-white shadow-sm">
+                <span class="relative z-10">${name}</span>
+              </button>
+            `).join('')}
+          </div>
+          <p class="text-xs text-gray-400 text-center mb-4">&#128274; Payment integration coming soon — you'll be able to pay securely via your preferred method.</p>
+
+          <!-- Add to cart placeholder -->
+          <button onclick="addToCart('${p.id}')" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-3.5 rounded-xl transition shadow-lg hover:shadow-xl text-base">
+            &#128722; Quick Checkout — ${document.getElementById(`total-${p.id}`) ? document.getElementById(`total-${p.id}`).textContent : '$0'}
+          </button>
+
+          <p class="text-[0.65rem] text-gray-400 text-center mt-3">&copy; Goose Feather Crafts</p>
+        </div>
+      `;
+
+      // Setup event listeners for radio buttons (labels/seals toggle)
+      setTimeout(() => {
+        const radios = body.querySelectorAll(`input[name="price-${p.id}"]`);
+        radios.forEach(r => r.addEventListener('change', () => updatePrice(p.id)));
+        
+        // Add click handlers to highlight the chosen row
+        const rows = body.querySelectorAll(`.qty-option-wrapper[title]`);
+      }, 0);
+
+      document.getElementById('modal').classList.remove('modal-hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // ===== Price update logic =====
+    function updatePrice(productId, qtyLabel, price) {
+      document.getElementById(`subtotal-${productId}`).textContent = `$${price}`;
+      document.getElementById(`total-${productId}`).textContent = `$${price + shippingCost}`;
+      // Update the card button text too
+      const cardBtn = document.querySelector(`#modal-body button[onclick*="Quick Checkout"]`);
+      if (cardBtn) cardBtn.innerHTML = '&#128722; Quick Checkout — $' + (price + shippingCost);
+    }
+
+    // ===== Product full description =====
+    function productFullDescription() {
+      return `Add a touch of pizzaz to your mail with these customreturn address labels! Featuring unique and whimsical designs, these labels are perfect for adding flair to birthday invitations, holiday cards, and everyday mail. Each label is 1&quot; x 2.625&quot; with a smooth matte finish, making them both stylish and functional.`;
+    }
+
+    // ===== Close modal =====
+    function closeModal() {
+      document.getElementById('modal').classList.add('modal-hidden');
+      document.body.style.overflow = '';
+    }
+
+    // ESC key close
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    // ===== Toast notification =====
+    let toastTimer;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      toast.classList.remove('toast-hide');
+      toast.classList.add('toast-show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('toast-show');
+        toast.classList.add('toast-hide');
+      }, 3000);
+    }
+
+    // ===== Checkout placeholder =====
+    function checkout(productId, method) {
+      const p = products.find(x => x.id === productId);
+
+      // Find currently selected price across all qty options
+      let selectedPrice = null;
+      qtyOptions.forEach(q => {
+        const radio = document.querySelector(`input[name="price-opt-${productId}-${q.label}"]:checked`);
+        if (radio && radio.checked) selectedPrice = parseInt(radio.value);
+      });
+
+      if (!selectedPrice) { showToast('Please select a quantity first.'); return; }
+
+      const email = document.getElementById(`email-${productId}`)?.value;
+      if (!email) { showToast('Please enter your email for proof & contact.'); return; }
+
+      showToast(`Thank you! For ${selectedPrice} label${selectedPrice > 1 ? 's' : ''}, we'll reach out at <strong>${email}</strong> with a proof. (Integration pending)`);
+    }
+
+    // ===== Quick checkout (add-to-cart simulation) =====
+    function addToCart(productId) {
+      const p = products.find(x => x.id === productId);
+
+      // Find currently selected price across all qty options
+      let selectedPrice = null;
+      qtyOptions.forEach(q => {
+        const radio = document.querySelector(`input[name="price-opt-${productId}-${q.label}"]:checked`);
+        if (radio && radio.checked) selectedPrice = parseInt(radio.value);
+      });
+
+      if (!selectedPrice) { showToast('Please select a quantity first.'); return; }
+
+      const countEl = document.getElementById('cart-count');
+      countEl.textContent = parseInt(countEl.textContent || 0) + 1;
+      countEl.classList.remove('hidden');
+
+      showToast(`${p.title} added to cart!`);
+    }
+
+    // ===== Price row hover/click highlight =====
+    function initPriceRows() {
+      document.querySelectorAll('.qty-option-wrapper.price-row').forEach(row => {
+        row.addEventListener('click', (e) => {
+          // Let the radio handle toggle; we just add visual feedback
+          const radios = row.querySelectorAll('input[type="radio"]');
+          if (!radios[0]?.disabled) {
+            document.querySelectorAll('.qty-option-wrapper.price-row').forEach(r => r.classList.remove('selected'));
+            row.classList.add('selected');
+          }
+        });
+      });
+    }
+
+    // ===== Cart summary toggle (placeholder) =====
+    function toggleCartSummary() {
+      showToast('Cart feature coming soon! (Currently using direct checkout)');
+    }
+
+    // ===== Init =====
+    renderProducts();
+    initPriceRows();
+  </script>
+</body>
+</html>
