@@ -300,6 +300,35 @@
 
     const shippingCost = 6;
 
+    // Shopping cart
+    let cart = [];
+
+    // Load cart from localStorage on page load
+    function loadCart() {
+      const savedCart = localStorage.getItem('cart');
+      if (savedCart) {
+        cart = JSON.parse(savedCart);
+        updateCartCount();
+      }
+    }
+
+    // Save cart to localStorage
+    function saveCart() {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    // Update cart count display
+    function updateCartCount() {
+      const countEl = document.getElementById('cart-count');
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      countEl.textContent = totalItems;
+      if (totalItems > 0) {
+        countEl.classList.remove('hidden');
+      } else {
+        countEl.classList.add('hidden');
+      }
+    }
+
     // ===== Render product grid =====
     function renderProducts() {
       const grid = document.getElementById('product-grid');
@@ -319,6 +348,21 @@
         </div>
       `).join('');
     }
+
+    // ===== Open modal =====
+    function openModal() {
+      document.getElementById('modal').classList.remove('modal-hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // ===== Close modal =====
+    function closeModal() {
+      document.getElementById('modal').classList.add('modal-hidden');
+      document.body.style.overflow = '';
+    }
+
+    // ESC key close
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
     // ===== Open product modal =====
     function openProduct(id) {
@@ -349,7 +393,7 @@
             </h4>
             <div class="grid grid-cols-2 gap-4">
               ${qtyOptions.map(q => `
-                <div class="qty-option-wrapper price-row p-4 border rounded-lg cursor-pointer" onclick="this.querySelector('input').click()">
+                <div class="qty-option-wrapper price-row p-4 border rounded-lg cursor-pointer" onclick="selectPriceOption('${id}', '${q.label}', 'labels')">
                   <label class="flex items-center space-x-2">
                     <input type="radio" name="price-opt-${id}-${q.label}" value="${q.price}"
                            class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300">
@@ -359,7 +403,7 @@
                     </div>
                   </label>
                 </div>
-                <div class="qty-option-wrapper price-row p-4 border rounded-lg cursor-pointer" onclick="this.querySelector('input').click()">
+                <div class="qty-option-wrapper price-row p-4 border rounded-lg cursor-pointer" onclick="selectPriceOption('${id}', '${q.label}', 'seals')">
                   <label class="flex items-center space-x-2">
                     <input type="radio" name="price-opt-${id}-${q.label}" value="${q.withSeals}"
                            class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300">
@@ -393,33 +437,18 @@
       openModal();
     }
 
-    // Shopping cart
-    let cart = [];
-
-    // Load cart from localStorage on page load
-    function loadCart() {
-      const savedCart = localStorage.getItem('cart');
-      if (savedCart) {
-        cart = JSON.parse(savedCart);
-        updateCartCount();
-      }
-    }
-
-    // Save cart to localStorage
-    function saveCart() {
-      localStorage.setItem('cart', JSON.stringify(cart));
-    }
-
-    // Update cart count display
-    function updateCartCount() {
-      const countEl = document.getElementById('cart-count');
-      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-      countEl.textContent = totalItems;
-      if (totalItems > 0) {
-        countEl.classList.remove('hidden');
-      } else {
-        countEl.classList.add('hidden');
-      }
+    // ===== Select price option =====
+    function selectPriceOption(productId, qtyLabel, type) {
+      const radioName = `price-opt-${productId}-${qtyLabel}`;
+      const radios = document.querySelectorAll(`input[name="${radioName}"]`);
+      
+      // Remove selected class from all rows for this product and quantity
+      document.querySelectorAll(`.price-row`).forEach(row => {
+        row.classList.remove('selected');
+      });
+      
+      // Add selected class to the clicked row
+      event.currentTarget.closest('.price-row').classList.add('selected');
     }
 
     // ===== Add item to cart =====
@@ -432,21 +461,18 @@
       let withSeals = false;
 
       qtyOptions.forEach(q => {
-        // Check the currently selected radio buttons for labels only and with seals options
+        // Check for labels only option
         const labelsOnlyRadio = document.querySelector(`input[name="price-opt-${productId}-${q.label}"]:checked`);
         if (labelsOnlyRadio && !labelsOnlyRadio.value.includes("withSeals")) {
           selectedPrice = parseInt(labelsOnlyRadio.value);
           selectedQty = parseInt(q.label);
           withSeals = false;
         }
-        // Check for the "with seals" option
-        else if (labelsOnlyRadio) {
-          const correspondingLabelsOnly = document.querySelector(`input[name="price-opt-${productId}-${q.label}"]:not([name*="seals"])`);
-          if (correspondingLabelsOnly && labelsOnlyRadio.value === q.withSeals) {
-            selectedPrice = parseInt(labelsOnlyRadio.value);
-            selectedQty = parseInt(q.label);
-            withSeals = true;
-          }
+        // Check for with seals option
+        else if (labelsOnlyRadio && labelsOnlyRadio.value.includes("withSeals")) {
+          selectedPrice = parseInt(labelsOnlyRadio.value);
+          selectedQty = parseInt(q.label);
+          withSeals = true;
         }
       });
 
@@ -498,15 +524,6 @@
     function productFullDescription() {
       return `Add a touch of pizzaz to your mail with these customreturn address labels! Featuring unique and whimsical designs, these labels are perfect for adding flair to birthday invitations, holiday cards, and everyday mail. Each label is 1&quot; x 2.625&quot; with a smooth matte finish, making them both stylish and functional.`;
     }
-
-    // ===== Close modal =====
-    function closeModal() {
-      document.getElementById('modal').classList.add('modal-hidden');
-      document.body.style.overflow = '';
-    }
-
-    // ESC key close
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
     // ===== Toast notification =====
     let toastTimer;
@@ -579,107 +596,6 @@
         saveCart();
         updateCartCount();
         closeModal();
-      }
-    }
-
-    // ===== Shopping Cart System =====
-    let cart = [];
-
-    // Load cart from localStorage on page load
-    function loadCart() {
-      const savedCart = localStorage.getItem('cart');
-      if (savedCart) {
-        cart = JSON.parse(savedCart);
-        updateCartCount();
-      }
-    }
-
-    // Save cart to localStorage
-    function saveCart() {
-      localStorage.setItem('cart', JSON.stringify(cart));
-    }
-
-    // Add item to cart
-    function addToCart(productId) {
-      const p = products.find(x => x.id === productId);
-
-      // Find the currently selected radio button for this product
-      let selectedPrice = null;
-      let selectedQty = 0;
-      let withSeals = false;
-
-      qtyOptions.forEach(q => {
-        // Check for the currently selected "labels only" option for this quantity
-        const labelsOnlyRadio = document.querySelector(`input[name="price-opt-${productId}-${q.label}"]:checked`);
-        if (labelsOnlyRadio && !labelsOnlyRadio.name.includes("seals")) {
-          selectedPrice = parseInt(labelsOnlyRadio.value);
-          selectedQty = parseInt(q.label);
-          withSeals = false;
-        }
-        // Check for the "with seals" option
-        else if (labelsOnlyRadio && labelsOnlyRadio.name.includes("seals")) {
-          const correspondingLabelsOnly = document.querySelector(`input[name="price-opt-${productId}-${q.label}"]:not([name*="seals"])`);
-          if (correspondingLabelsOnly) {
-            selectedPrice = parseInt(labelsOnlyRadio.value);
-            selectedQty = parseInt(q.label);
-            withSeals = true;
-          }
-        }
-      });
-
-      if (!selectedPrice || !selectedQty) { showToast('Please select a quantity first.'); return; }
-
-      // Get personalization and email
-      const personalizedText = document.getElementById(`personalize-${productId}`)?.value;
-      const email = document.getElementById(`email-${productId}`)?.value;
-
-      if (!email) { showToast('Please enter your email for proof & contact.'); return; }
-
-      // Create item object
-      const item = {
-        id: productId,
-        title: p.title,
-        price: selectedPrice,
-        quantity: selectedQty,
-        withSeals: withSeals,
-        personalizedText: personalizedText,
-        email: email,
-        total: (selectedPrice * selectedQty) + shippingCost // Including shipping per item
-      };
-
-      // Add to cart or update quantity if already exists
-      const existingItemIndex = cart.findIndex(cartItem =>
-        cartItem.id === productId &&
-        cartItem.withSeals === withSeals &&
-        cartItem.personalizedText === personalizedText
-      );
-
-      if (existingItemIndex > -1) {
-        // Update quantity if item already in cart
-        cart[existingItemIndex].quantity += selectedQty;
-        cart[existingItemIndex].total = cart[existingItemIndex].price * cart[existingItemIndex].quantity + shippingCost;
-      } else {
-        // Add new item to cart
-        cart.push(item);
-      }
-
-      saveCart();
-      updateCartCount();
-      showToast(`${p.title} added to cart!`);
-
-      // Close modal after adding to cart
-      closeModal();
-    }
-
-    // Update cart count display
-    function updateCartCount() {
-      const countEl = document.getElementById('cart-count');
-      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-      countEl.textContent = totalItems;
-      if (totalItems > 0) {
-        countEl.classList.remove('hidden');
-      } else {
-        countEl.classList.add('hidden');
       }
     }
 
