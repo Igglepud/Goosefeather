@@ -265,26 +265,36 @@
         id: 'axolotl',
         title: 'Axolotl Address Labels',
         image: 'images/axolotlad.jpg',
+        shortDescription: "Add some whimsical fun to your mailings with these personalized return address labels shipped right to your door!",
+        fullDescription: "Add a touch of pizzaz to your mail with these custom return address labels! Featuring unique and whimsical designs, these labels are perfect for adding flair to birthday invitations, holiday cards, and everyday mail. Each label is 1\" x 2.625\" with a smooth matte finish, making them both stylish and functional."
       },
       {
         id: 'construction',
         title: 'Construction Truck Address Labels',
         image: 'images/constructiontruckad.jpg',
+        shortDescription: "Add some whimsical fun to your mailings with these personalized return address labels shipped right to your door!",
+        fullDescription: "Add a touch of pizzaz to your mail with these custom return address labels! Featuring unique and whimsical designs, these labels are perfect for adding flair to birthday invitations, holiday cards, and everyday mail. Each label is 1\" x 2.625\" with a smooth matte finish, making them both stylish and functional."
       },
       {
         id: 'cow',
         title: 'Cow Address Labels',
         image: 'images/dairycowad.jpg',
+        shortDescription: "Add some whimsical fun to your mailings with these personalized return address labels shipped right to your door!",
+        fullDescription: "Add a touch of pizzaz to your mail with these custom return address labels! Featuring unique and whimsical designs, these labels are perfect for adding flair to birthday invitations, holiday cards, and everyday mail. Each label is 1\" x 2.625\" with a smooth matte finish, making them both stylish and functional."
       },
       {
         id: 'dragonfly',
         title: 'Dragonfly Address Labels',
         image: 'images/dragonflyad.jpg',
+        shortDescription: "Add some whimsical fun to your mailings with these personalized return address labels shipped right to your door!",
+        fullDescription: "Add a touch of pizzaz to your mail with these custom return address labels! Featuring unique and whimsical designs, these labels are perfect for adding flair to birthday invitations, holiday cards, and everyday mail. Each label is 1\" x 2.625\" with a smooth matte finish, making them both stylish and functional."
       },
       {
-        id: 'flowers',
-        title: 'Floral Address Labels',
-        image: 'images/FlowersAd.jpg',
+        id: 'owl',
+        title: 'Owl Address Labels',
+        image: 'images/owlad.jpg',
+        shortDescription: "Add some whimsical fun to your mailings with these personalized return address labels shipped right to your door!",
+        fullDescription: "Add a touch of pizzaz to your mail with these custom return address labels! Featuring unique and whimsical designs, these labels are perfect for adding flair to birthday invitations, holiday cards, and everyday mail. Each label is 1\" x 2.625\" with a smooth matte finish, making them both stylish and functional."
       },
     ];
 
@@ -339,7 +349,7 @@
           </div>
           <div class="p-5">
             <h4 class="font-display font-semibold text-gray-900 text-lg mb-1">${p.title}</h4>
-            <p class="text-gray-500 text-sm leading-relaxed line-clamp-2">Add some whimsical fun to your mailings with these personalized return address labels shipped right to your door!</p>
+            <p class="text-gray-500 text-sm leading-relaxed line-clamp-2">${p.shortDescription}</p>
             <div class="flex items-center justify-between mt-3">
               <span class="text-teal-700 font-bold text-lg">$${qtyOptions[0].price}</span>
               <span class="text-xs bg-teal-50 text-teal-700 px-2 py-1 rounded-full border border-teal-200 font-medium">From</span>
@@ -380,7 +390,7 @@
         <!-- Details -->
         <div class="p-6 sm:p-8">
           <h2 class="font-display text-2xl font-bold text-gray-900 mb-2">${p.title}</h2>
-          <p class="text-gray-500 leading-relaxed mb-6">Add a touch of pizzaz to your mail with these custom return address labels! Featuring unique and whimsical designs, these labels are perfect for adding flair to birthday invitations, holiday cards, and everyday mail. Each label is 1" x 2.625" with a smooth matte finish, making them both stylish and functional.</p>
+          <p class="text-gray-500 leading-relaxed mb-6">${p.fullDescription}</p>
 
           <!-- Divider -->
           <hr class="border-gray-100 mb-6">
@@ -391,7 +401,7 @@
               <svg class="w-4 h-4 text-teal-600" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V12.732a2 2 0 000-3.464V4zM17 4a1 1 0 10-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4z"/></svg>
               Select Quantity &amp; Option
             </h4>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               ${qtyOptions.map(q => `
                 <div class="qty-option-wrapper price-row p-4 border rounded-lg cursor-pointer" onclick="selectPriceOption('${id}', '${q.label}', 'labels')">
                   <label class="flex items-center space-x-2">
@@ -420,13 +430,13 @@
           <!-- Personalization -->
           <div class="mb-6">
             <h4 class="font-semibold text-gray-900 mb-2">Personalization</h4>
-            <textarea id="personalize-${id}" class="w-full p-3 border rounded-lg focus:ring-teal-500 focus:border-teal-500" rows="3" placeholder="Enter name/address or custom text for your labels"></textarea>
+            <textarea id="personalize-${id}" class="w-full p-3 border rounded-lg focus:ring-teal-500 focus:border-teal-500" rows="3" placeholder="Please enter the name/address or custom text (up to four lines) that you'd like on your labels:"></textarea>
           </div>
 
           <!-- Email -->
           <div class="mb-8">
             <h4 class="font-semibold text-gray-900 mb-2">Proof Contact</h4>
-            <input type="email" id="email-${id}" class="w-full p-3 border rounded-lg focus:ring-teal-500 focus:border-teal-500" placeholder="Enter email address for proof and questions">
+            <input type="email" id="email-${id}" class="w-full p-3 border rounded-lg focus:ring-teal-500 focus:border-teal-500" placeholder="Please enter an email address where I can reach you regarding a proof and/or questions for your order:">
           </div>
 
           <!-- Add to Cart -->
@@ -463,16 +473,10 @@
       qtyOptions.forEach(q => {
         // Check for labels only option
         const labelsOnlyRadio = document.querySelector(`input[name="price-opt-${productId}-${q.label}"]:checked`);
-        if (labelsOnlyRadio && !labelsOnlyRadio.value.includes("withSeals")) {
+        if (labelsOnlyRadio) {
           selectedPrice = parseInt(labelsOnlyRadio.value);
           selectedQty = parseInt(q.label);
           withSeals = false;
-        }
-        // Check for with seals option
-        else if (labelsOnlyRadio && labelsOnlyRadio.value.includes("withSeals")) {
-          selectedPrice = parseInt(labelsOnlyRadio.value);
-          selectedQty = parseInt(q.label);
-          withSeals = true;
         }
       });
 
@@ -518,11 +522,6 @@
 
       // Close modal after adding to cart
       closeModal();
-    }
-
-    // ===== Product full description =====
-    function productFullDescription() {
-      return `Add a touch of pizzaz to your mail with these customreturn address labels! Featuring unique and whimsical designs, these labels are perfect for adding flair to birthday invitations, holiday cards, and everyday mail. Each label is 1&quot; x 2.625&quot; with a smooth matte finish, making them both stylish and functional.`;
     }
 
     // ===== Toast notification =====
