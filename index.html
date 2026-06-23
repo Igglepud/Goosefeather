@@ -108,6 +108,16 @@
     /* Quantity option card */
     .qty-option-wrapper input[type="radio"] { display: none; }
     .qty-option-wrapper label { cursor: pointer; }
+
+    /* Selected seal option highlight */
+    .seal-option.selected {
+      background-color: #ccfbf1 !important;
+      border-left: 3px solid #0d9488 !important;
+      color: #0d9488 !important;
+    }
+    .seal-option.selected span:first-child {
+      font-weight: 600;
+    }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -137,10 +147,7 @@
         <!-- Cart icon -->
         <div class="relative" id="cart-icon">
           <button onclick="toggleCartSummary()" class="relative p-2 text-gray-700 hover:text-teal-700 transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15a3 3 0 00-3-3m-7.25 0a3 3 0 013-3h2.5a3 3 0 013 3m-9.8 0H2.25"/>
-              <path d="M2.25 3v6.25l3.75 11.25a1.125 1.125 0 01-1.1 1.5H1.1a1.125 1.125 0 01-1.1-1.5L4.875 9.25V3h15v6" fill="none"/>
-            </svg>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.667 14.4a1 1 0 001 .83h10.5a1 1 0 001-.82l2.1-9.95a.5.5 0 00-.5-.5H6.2"/></svg>
             <span id="cart-count" class="absolute -top-1 -right-1 bg-teal-600 text-white text-[0.6rem] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
           </button>
         </div>
@@ -187,7 +194,7 @@
   <section id="products" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
     <div class="text-center mb-12">
       <h3 class="font-display text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Choose Your Design</h3>
-      <p class="text-gray-500 max-w-lg mx-auto">Each design is printed on high-quality matte sticker paper — 1" x 2.625" labels with vibrant colors and smooth texture.</p>
+      <p class="text-gray-500 max-w-lg mx-auto">Each design is printed on high-quality matte sticker paper — 1&quot; x 2.625&quot; labels with vibrant colors and smooth texture.</p>
     </div>
 
     <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 stagger-children">
@@ -200,7 +207,7 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
       <div class="text-center mb-10">
         <h3 class="font-display text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Designed Just for You!</h3>
-        <p class="text-teal-600 font-medium">✨ Each label is 1" x 2.625" with a smooth matte finish</p>
+        <p class="text-teal-600 font-medium">✨ Each label is 1&quot; x 2.625&quot; with a smooth matte finish</p>
       </div>
       <div class="prose prose-gray mx-auto text-gray-600 leading-relaxed space-y-4">
         <p>These labels are printed on high-quality matte sticker paper and feature one-of-a-kind illustrations and themed clipart. Whether you're sending birthday invites or just want to add a little personality to your mail, these labels bring a fun and whimsical touch to every envelope!</p>
@@ -213,7 +220,7 @@
         </div>
         <div class="bg-teal-50 rounded-xl p-6 border border-teal-100">
           <h4 class="font-semibold text-teal-800 mb-2">✔ Matching Envelope Seals</h4>
-          <p class="text-sm text-gray-600">Complete the look with coordinating 1" round envelope seals (optional).</p>
+          <p class="text-sm text-gray-600">Complete the look with coordinating 1&quot; round envelope seals (optional).</p>
         </div>
         <div class="bg-teal-50 rounded-xl p-6 border border-teal-100">
           <h4 class="font-semibold text-teal-800 mb-2">✔ Custom Orders Welcome</h4>
@@ -292,7 +299,7 @@
       {
         id: 'owl',
         title: 'Owl Address Labels',
-        image: 'images/owlad.jpg',
+        image: 'images/FlowersAd.jpg',
         shortDescription: "Add some whimsical fun to your mailings with these personalized return address labels shipped right to your door!",
         fullDescription: "Add a touch of pizzaz to your mail with these custom return address labels! Featuring unique and whimsical designs, these labels are perfect for adding flair to birthday invitations, holiday cards, and everyday mail. Each label is 1\" x 2.625\" with a smooth matte finish, making them both stylish and functional."
       },
@@ -310,34 +317,16 @@
 
     const shippingCost = 6;
 
-    // Shopping cart
-    let cart = [];
-
-    // ===== Render product grid =====
-    function renderProducts() {
-      const grid = document.getElementById('product-grid');
-      grid.innerHTML = products.map(p => `
-        <div class="product-card bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 cursor-pointer" onclick="openProduct('${p.id}')">
-          <div class="aspect-[4/3] overflow-hidden bg-gray-100">
-            <img src="${p.image}" alt="${p.title}" loading="lazy" class="w-full h-full object-cover img-zoom" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-full text-gray-400\\'><svg class=\\'w-12 h-12\\' fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'1.5\\' d=\\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z\\'/></svg><p class=\\'text-xs mt-2\\'>Image unavailable</p></div>'">
-          </div>
-          <div class="p-5">
-            <h4 class="font-display font-semibold text-gray-900 text-lg mb-1">${p.title}</h4>
-            <p class="text-gray-500 text-sm leading-relaxed line-clamp-2">${p.shortDescription}</p>
-            <div class="flex items-center justify-between mt-3">
-              <span class="text-teal-700 font-bold text-lg">$${qtyOptions[0].price}</span>
-              <span class="text-xs bg-teal-50 text-teal-700 px-2 py-1 rounded-full border border-teal-200 font-medium">From</span>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-
     // ===== Init =====
-    renderProducts();
-  
-   
+    // renderProducts(); // Now handled by productManager.init()
   </script>
+  <!-- Load all JavaScript files in the correct order -->
+  <script src="src/utils.js"></script>
+  <script src="src/cart.js"></script>
+  <script src="src/modal.js"></script>
+  <script src="src/productManager.js"></script>
+  <script src="src/app.js"></script>
+  <!-- Direct test script for debugging -->
+
 </body>
 </html>
